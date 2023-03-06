@@ -14,8 +14,8 @@ class Cliente:
         Telefone - {self._telefone}
         ''')
 
-     def imprimirClienteExcluido(self):
-         return f'''
+    def imprimirClienteExcluido(self):
+        return f'''
         O Cliente selecionado foi excluído!
         '''
 
@@ -26,7 +26,7 @@ class Cliente:
         '''
         return sql
 
-    def DeletarCliente(self):
+    def deletarCliente(self):
         sql = f'''
         DELETE FROM "Cliente"
         WHERE "ID" = {self._id}
@@ -37,7 +37,7 @@ class Cliente:
     def consultarAlugueis(self):
         sql = f'''
         SELECT * FROM "Aluguel"
-        WHERE "ID_Cliente" = '{self._id}'
+        WHERE "id_Cliente" = '{self._id}'
         '''
         return sql
 
@@ -52,7 +52,7 @@ class Cliente:
     def inserirCliente(self):
         sql = f'''
         INSERT INTO "Cliente"
-        VALUES(default, '{self._nome}', '{self._cpf}','{self._telefone}' )
+        VALUES(default, '{self._nome}' , '{self._cpf}' , '{self._telefone}' )
         
         '''
 

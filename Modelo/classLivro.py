@@ -1,7 +1,7 @@
 class Livro:
     def __init__(self, id, nome, autor, paginas):
-        self._id = ID_Livro
-        self._nome= nome_Livro
+        self._id = id
+        self._nome= nome
         self._autor = autor
         self._paginas = paginas
 
@@ -9,21 +9,21 @@ class Livro:
     def imprimirLivro(self):
 
         print(f'''
-        ID - {self._ID_Livro}
+        ID - {self._id}
         Nome - {self._nome}
         Autor - {self._autor}
         Número de Páginas: {self._paginas}
         ''')
 
-     def imprimirLivroDeletado(self):
+    def imprimirLivroDeletado(self):
         return f'''
         O Livro selecionado foi excluído!
         '''
 
-   def listarLivros(self):
+    def listarLivros(self):
         
         sql = f'''
-        SELECT * FROM "Livros" 
+        SELECT * FROM "Livro" 
         WHERE "ID" = {self._id}
         
         '''
@@ -32,7 +32,7 @@ class Livro:
     def DeletarLivros(self):
 
         sql = f'''
-        DELETE FROM "Livros"
+        DELETE FROM "Livro"
         WHERE "ID" = {self._id}
         
         '''
@@ -41,15 +41,15 @@ class Livro:
     def alterarLivros(self):
 
         sql = f'''
-        UPDATE "Livros"
-        SET "NomeLivro" = '{self._nome}', "Autor" = '{self._autor}', "NumeroPaginas" = '{self._paginas}'
+        UPDATE "Livro"
+        SET "NomeLivro" = '{self._nome}', "Autor" = '{self._autor}', "Número de Páginas" = '{self._paginas}'
         WHERE "ID" = '{self._id}'
         '''
         return sql
         
     def consultarLivroPorID(self):
         sql = f'''
-        SELECT * FROM "Livros"
+        SELECT * FROM "Livro"
         WHERE "ID" = '{self._id}'
         '''
         return sql
@@ -63,8 +63,8 @@ class Livro:
 
     def inserirLivro(self):
         sql = f'''
-        INSERT INTO "Livros"
-        VALUES(default, '{self._nome}', '{self._autor}')
+        INSERT INTO "Livro"
+        VALUES(default, '{self._nome}', '{self._autor}', '{self._paginas}')
         
         '''
 

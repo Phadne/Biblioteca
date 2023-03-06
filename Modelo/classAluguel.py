@@ -37,17 +37,16 @@ class Aluguel:
     def consultarAluguelporid_Cliente(self):
         sql = f'''
         SELECT * FROM "Aluguel"
-        WHERE "ID_Clientes" = '{self.id_Cliente}'
+        WHERE "id_Cliente" = '{self.id_Cliente}'
         '''
         return sql
     
     def consultarAluguelporid_Livro(self):
         sql = f'''
         SELECT * FROM "Aluguel"
-        WHERE "ID_Livros" = '{self._id_Livro}'
+        WHERE "id_Livros" = '{self._id_Livro}'
         '''
         return sql
-
    
 
     

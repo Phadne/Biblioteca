@@ -1,7 +1,7 @@
 import psycopg2
 from Controle.classConexao import Conexao
 from Modelo.classCliente import Cliente
-from Modelo.classLivros import Livro
+from Modelo.classLivro import Livro
 from Modelo.classAluguel import Aluguel
 
 
@@ -31,7 +31,7 @@ def criarTabelaLivro(conexao):
         "ID" int GENERATED ALWAYS AS IDENTITY,
         "Nome" varchar(255) NOT NULL,
         "Autor" varchar(255) NOT NULL,
-        "Número de Páginas"  varchar(255) NOT NULL,
+        "Número de Páginas" varchar(255) NOT NULL,
         Primary Key("ID")
     );
     ''')
@@ -61,7 +61,7 @@ def criarTabelaAluguel(conexao):
     );
     ''')
 
-def menuClientes(conexao):
+def menuCliente(conexao):
     print("Lista de clientes: ")
     resultado = conexao.consultarBanco('''
     Select * FROM "Cliente"
@@ -82,8 +82,8 @@ def menuClientes(conexao):
         case "1":
             while True:
                 clienteID = input("Digite o ID do cliente")
-                clienteEscolhido = Cliente(clienteID, None, None)
-                resultado = conexao.consultarBanco(clienteEscolhido.consultarClientePorID())
+                clienteEscolhido = Cliente(clienteID, None, None, None)
+                resultado = conexao.consultarBanco(clienteEscolhido.listarCliente())
                 if resultado != []:
                     clienteEscolhido._nome = resultado[0][1]
                     clienteEscolhido._cpf = resultado[0][2]
@@ -94,6 +94,8 @@ def menuClientes(conexao):
                         print(f'''
                         Escolha uma das opções:
                         1. Ver alugueis
+                        2.Deletar Cliente
+                        3.Alterar Cliente
                         0. Voltar para o menu principal
                         ''')
                         opcoes = input("Digite o numero da opção:")
@@ -105,14 +107,27 @@ def menuClientes(conexao):
                                     
                                     print("ID | Livro | Data")
                                     for aluguel in resultado:
-                                        livro = Livro(aluguel[2],None, None)
-                                        livroAlugado = conexao.consultarBanco(livro.consultarLivroPorID())[0]
+                                        livro = Livro(aluguel[2],None, None,None)
+                                        livroAlugado = conexao.consultarBanco(livro.listarLivros())[0]
                                         livro._nome = livroAlugado[1]
                                         livro._autor = livroAlugado[2]
                                         livro._paginas = livroAlugado[3]
                                         print(f"{aluguel[0]} | {livro._nome} | {aluguel[3]}")
                                 else:
                                     print("Esse usuário não possui alugueis")
+                                input("Tecle ENTER para continuar")
+                            case "2":
+                                print(f"Deletar Cliente {clienteEscolhido._nome}")
+                                conexao.manipularBanco(clienteEscolhido.deletarCliente())                  
+                                print("Você excluiu este Cliente!")
+                                input("Tecle ENTER para continuar")
+                            case "3":
+                                print(f"Alterar Cliente {clienteEscolhido._nome}")
+                                clienteEscolhido._nome = input("Digite novo nome:")
+                                clienteEscolhido._cpf = input("Digite novo cpf:")
+                                clienteEscolhido._telefone = input("Digite novo telefone:")
+                                clienteEscolhido.imprimirCliente()
+                                conexao.manipularBanco(clienteEscolhido.alterarCliente())  
                                 input("Tecle ENTER para continuar")
                             case "0":
                                 print("Saindo do menu cliente.")
@@ -125,7 +140,7 @@ def menuClientes(conexao):
                     print("Você escolheu um ID inválido")
         case "2":
             while (True):
-                novoCliente = Cliente(None,None,None)
+                novoCliente = Cliente(None,None,None,None)
                 novoCliente._nome = input("Digite o nome do cliente:")
                 novoCliente._cpf = input("Digite o cpf do cliente:")
                 novoCliente._telefone = input("Digite o telefone do cliente:")
@@ -133,8 +148,8 @@ def menuClientes(conexao):
                 print("Novo cliente inserido")
                 break
 
-def menuLivros(conexao):
-    print("Lista de Livros: ")
+def menuLivro(conexao):
+    print("Lista de Livro: ")
     resultado = conexao.consultarBanco('''
     Select * FROM "Livro"
     ORDER BY "ID" ASC
@@ -154,8 +169,8 @@ def menuLivros(conexao):
         case "1":
             while True:
                 livroID = input("Digite o ID do livro")
-                livroEscolhido = Livro(livroID, None, None)
-                resultado = conexao.consultarBanco(livroEscolhido.consultarLivroPorID())
+                livroEscolhido = Livro(livroID, None, None, None)
+                resultado = conexao.consultarBanco(livroEscolhido.listarLivros())
                 if resultado != []:
                     livroEscolhido._nome = resultado[0][1]
                     livroEscolhido._autor = resultado[0][2]
@@ -177,8 +192,8 @@ def menuLivros(conexao):
                                     
                                     print("ID | Cliente | Data")
                                     for aluguel in resultado:
-                                        cliente = Cliente(aluguel[1],None, None)
-                                        clienteAlugado = conexao.consultarBanco(cliente.consultarClientePorID())[0]
+                                        cliente = Cliente(aluguel[1],None, None, None)
+                                        clienteAlugado = conexao.consultarBanco(cliente.listarCliente())[0]
                                         cliente._nome = clienteAlugado[1]
                                         cliente._cpf = clienteAlugado[2]
                                         print(f"{aluguel[0]} | {cliente._nome} | {aluguel[3]}")
@@ -186,7 +201,7 @@ def menuLivros(conexao):
                                     print("Esse livro ainda não foi alugado")
                                 input("Tecle ENTER para continuar")
                             case "0":
-                                print("Saindo do menu livros.")
+                                print("Saindo do menu livro.")
                                 break
                             case _:
                                 print("Você escolheu uma opção inválida")
@@ -196,9 +211,10 @@ def menuLivros(conexao):
                     print("Você escolheu um ID inválido")
         case "2":
             while (True):
-                novoLivro = Livro(None,None,None)
+                novoLivro = Livro(None,None,None, None)
                 novoLivro._nome = input("Digite o nome do livro:")
                 novoLivro._autor = input("Digite o nome do autor:")
+                novoLivro._paginas = input("Digite o número de páginas:")
                 
                 conexao.manipularBanco(novoLivro.inserirLivro())
                 print("Novo livro inserido")
@@ -213,13 +229,13 @@ def menuAlugueis(conexao):
     print("ID | Cliente | Livro | Data ")
     for aluguel in resultado:
 
-        cliente = Cliente(aluguel[1], None, None)
-        clienteDoAluguel = conexao.consultarBanco(cliente.consultarClientePorID())[0]
+        cliente = Cliente(aluguel[1], None, None, None)
+        clienteDoAluguel = conexao.consultarBanco(cliente.listarCliente())[0]
         cliente._nome = clienteDoAluguel[1]
         cliente._cpf = clienteDoAluguel[2]
 
-        livro = Livro(aluguel[2], None, None)
-        livroDoAluguel = conexao.consultarBanco(livro.consultarLivroPorID())[0]
+        livro = Livro(aluguel[2], None, None, None)
+        livroDoAluguel = conexao.consultarBanco(livro.listarLivros())[0]
         livro._nome = livroDoAluguel[1]
         livro._autor = livroDoAluguel[2]
 
@@ -276,7 +292,7 @@ while True:
     try:
         login = input("Insira seu login:")
         password = input("Insira sua senha:")
-        con = Conexao("Biblioteca","localhost","5432",login,password)
+        con = Conexao("BibliotecaNovo","localhost","5432", login, password)
         break
 
     except (Exception, psycopg2.Error) as error:
@@ -285,7 +301,7 @@ while True:
 
 while True:
     try:
-        print("Bem vindo a biblioteca 'Biblioteca dos Livros' ")
+        print("Bem vindo a biblioteca 'Biblioteca dos Livro' ")
 
         print(f'''
     Escolha uma das opções:
@@ -299,9 +315,9 @@ while True:
 
         match opcoes:
             case "1":
-                menuClientes(con)
+                menuCliente(con)
             case "2":
-                menuLivros(con)
+                menuLivro(con)
             case "3":
                 menuAlugueis(con)
             case "0":
